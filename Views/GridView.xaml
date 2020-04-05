@@ -39,15 +39,15 @@
                     </Style>
                 </DataGrid.Resources>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name, Mode=OneWay}"/>
-                    <DataGridTextColumn Header="ID" Binding="{Binding Id, Mode=OneWay}"/>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name, Mode=OneTime}"/>
+                    <DataGridTextColumn Header="ID" Binding="{Binding Id, Mode=OneTime}"/>
                     <DataGridTextColumn Header="Responding" Binding="{Binding Responding, Mode=OneWay}"/>
                     <DataGridTextColumn Header="CPU %" Binding="{Binding Cpu, Mode=OneWay}" />
                     <DataGridTextColumn Header="RAM %" Binding="{Binding Ram, Mode=OneWay}"/>
                     <DataGridTextColumn Header="Streams" Binding="{Binding Threads, Mode=OneWay}"/>
-                    <DataGridTextColumn Header="User" Binding="{Binding User, Mode=OneWay}"/>
-                    <DataGridTextColumn Header="Time" Binding="{Binding StartTime, Mode=OneWay}"/>
-                    <DataGridTextColumn Header="Start From" Binding="{Binding StartFrom, Mode=OneWay}"/>
+                    <DataGridTextColumn Header="User" Binding="{Binding User, Mode=OneTime}"/>
+                    <DataGridTextColumn Header="Time" Binding="{Binding StartTime, Mode=OneTime}"/>
+                    <DataGridTextColumn Header="Start From" Binding="{Binding StartFrom, Mode=OneTime}"/>
                 </DataGrid.Columns>
             </DataGrid>
             <StackPanel>

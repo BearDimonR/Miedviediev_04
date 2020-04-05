@@ -1,43 +1,37 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Miedviediev_04.Models;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
 namespace Miedviediev_04.Managers
 {
-    public class ProcessUpdater: IUpdater
+    public class ProcessUpdater : IUpdater
     {
         public int IntervalList
         {
-            set
-            {
-                _listTimer.Interval = value;
-            }
+            set { _listTimer.Interval = value; }
         }
 
         public int IntervalMeta
         {
-            set
-            {
-                _metaTimer.Interval = value;
-            }
+            set { _metaTimer.Interval = value; }
         }
-        
-        private Timer _metaTimer;
-        private bool _metaUpdating;
-        private Timer _listTimer;
-        private bool _listUpdating;
 
-        public ObservableCollection<MyProcess> ActiveProcesses { get; private set; }
+        private Timer _metaTimer;
+        private Timer _listTimer;
+        private static object _locker = new object();
+
+        private static List<MyProcess> _activeProcesses;
 
         internal ProcessUpdater(int metaTimer, int listTimer)
         {
-            _metaUpdating = false;
-            _listUpdating = false;
-            ActiveProcesses = new ObservableCollection<MyProcess>();
+            _activeProcesses = new List<MyProcess>();
             _metaTimer = new Timer(metaTimer);
             _metaTimer.Elapsed += MetaUpdate;
             _metaTimer.AutoReset = true;
@@ -48,16 +42,31 @@ namespace Miedviediev_04.Managers
             {
                 try
                 {
-                   // if(process.MainModule != null)
-                        ActiveProcesses.Add( new MyProcess(process));
+                    _activeProcesses.Add(new MyProcess(process));
                 }
-                catch (System.ComponentModel.Win32Exception)
+                catch (Exception)
                 {
                     // ignored
                 }
             }
         }
-        
+
+        public ObservableCollection<MyProcess> GetProcesses()
+        {
+            lock (_locker)
+            {
+                return new ObservableCollection<MyProcess>(_activeProcesses);
+            }
+        }
+
+        public void RemoveProcess(MyProcess myProcess)
+        {
+            lock (_locker)
+            {
+                _activeProcesses.Remove(myProcess);
+            }
+        }
+
         public void StartUpdate()
         {
             _metaTimer.Start();
@@ -72,34 +81,35 @@ namespace Miedviediev_04.Managers
 
         private void MetaUpdate(object o, ElapsedEventArgs args)
         {
-            // while (_listUpdating){}
-            // _metaUpdating = true;
-            // foreach (var process in ActiveProcesses)
-            // {
-            //     process.Update(Process.GetProcessById(process.Id));
-            // }
-            // UpdateManager.Instance.Owner.UpdateUi();
-            // _metaUpdating = false;
+            lock (_locker)
+            {
+                foreach (var myProcess in _activeProcesses)
+                    myProcess.Update(Process.GetProcessById(myProcess.Id));
+                UpdateManager.Instance.Owner.UpdateUi();
+            }
         }
 
         private void ListUpdate(object o, ElapsedEventArgs args)
         {
-            while (_metaUpdating){}
-            _listUpdating = true;
-            ActiveProcesses.Clear();
+
+            List<MyProcess> list = new List<MyProcess>();
             foreach (var process in Process.GetProcesses())
             {
                 try
                 {
-                    ActiveProcesses.Add(new MyProcess(process));
+                    list.Add(new MyProcess(process));
                 }
                 catch (Exception)
                 {
                     // ignored
                 }
             }
-           // UpdateManager.Instance.Owner.UpdateUi();
-            _listUpdating = false;
+
+            lock (_locker)
+            {
+                _activeProcesses = list;
+                UpdateManager.Instance.Owner.UpdateUi();
+            }
         }
     }
 }

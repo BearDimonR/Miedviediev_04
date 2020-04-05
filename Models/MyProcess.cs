@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Management;
 
 namespace Miedviediev_04.Models
 {
@@ -19,33 +20,57 @@ namespace Miedviediev_04.Models
 
         public DateTime StartTime => _process.StartTime;
 
-        private string _user;
-        public string User => _user;
+        public string User { get; }
 
         public string StartFrom => _process.MainModule?.FileName;
 
         private PerformanceCounter _cpu;
-        public float Cpu => _cpu.NextValue();
+        public float Cpu => _cpu.NextValue() / Environment.ProcessorCount;
 
         private PerformanceCounter _ram;
-        public float Ram => _ram.NextValue();
+        public int Ram => Convert.ToInt32(_ram.NextValue()) / (int)(1024);
 
         public MyProcess(Process process)
         {
             Update(process);
+            _cpu =  new PerformanceCounter("Process", 
+                "% Processor Time", 
+                process.ProcessName, true);
+            _cpu.NextValue();
+            _ram =  new PerformanceCounter("Process",
+                "Working Set - Private", 
+                process.ProcessName, true);
+            _ram.NextValue();
+            // User = GetProcessOwner(process);
         }
 
         public void Update(Process process)
         {
             _process = process;
-            _user = process.StartInfo.UserName;
-            _cpu =  new PerformanceCounter("Process", 
-                "% Processor Time", 
-                process.ProcessName);;
-            _ram =  new PerformanceCounter("Process",
-                "Working Set - Private", 
-                process.ProcessName);
         }
+        
+        private static string GetProcessOwner(Process process)
+        {
+            ObjectQuery objQuery32 = new ObjectQuery("Select * From Win32_Process where ProcessId='" + process.Id + "'");
+            ManagementObjectSearcher mos32 = new ManagementObjectSearcher(objQuery32);
+            string processOwner = string.Empty;
+            foreach (ManagementObject mo in mos32.Get())
+            {
+                string[] s = new string[2];
+                mo.InvokeMethod("GetOwner", (object[])s);
+                try
+                {
+                    processOwner = s[0];
+                }
+                catch (Exception)
+                {
+                    //ignore
+                }
+                break;
+            }
+            return processOwner;
+        }
+
 
         public bool Equals(MyProcess other)
         {

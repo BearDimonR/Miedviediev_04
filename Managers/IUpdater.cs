@@ -8,12 +8,13 @@ namespace Miedviediev_04.Managers
         int IntervalList { set;}
         
         int IntervalMeta { set;}
-
-        ObservableCollection<MyProcess> ActiveProcesses { get; }
-
+        
         void StartUpdate();
         
         void StopUpdate();
-        
+
+        ObservableCollection<MyProcess> GetProcesses();
+
+        void RemoveProcess(MyProcess myProcess);
     }
 }

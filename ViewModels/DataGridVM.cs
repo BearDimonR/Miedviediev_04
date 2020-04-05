@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using Miedviediev_04.Managers;
 using Miedviediev_04.Models;
 using Miedviediev_04.Navigation;
@@ -11,7 +10,7 @@ using Miedviediev_04.Navigation;
 namespace Miedviediev_04.ViewModels
 {
     public class DataGridVm:BaseVm, INavigatableDataContext, IUpdaterOwner
-    {        
+    {
         private ObservableCollection<MyProcess> _processes;
         public ObservableCollection<MyProcess> Processes => _processes;
         
@@ -24,11 +23,9 @@ namespace Miedviediev_04.ViewModels
             InfoCommand = new RelayCommand<MyProcess>(NavigateInfo);
             FolderCommand = new RelayCommand<MyProcess>(OpenFolder);
             StopCommand = new RelayCommand<MyProcess>(StopProcess);
-            
             UpdateManager.Instance.Initialize(this);
-            _processes = new ObservableCollection<MyProcess>();
             Updater = new ProcessUpdater(2000, 5000);
-            UpdateUi();
+            _processes = Updater.GetProcesses();
             Updater.StartUpdate();
         }
 
@@ -37,9 +34,9 @@ namespace Miedviediev_04.ViewModels
             try
             {
                 obj.OriginProcess.Kill();
-                _processes.Remove(obj);
+                Updater.RemoveProcess(obj);
             }
-            catch (System.ComponentModel.Win32Exception e)
+            catch (Exception e)
             {
                 MessageBox.Show(e.Message,
                     "Can't be stopped!",
@@ -76,7 +73,7 @@ namespace Miedviediev_04.ViewModels
         
         public void UpdateUi()
         {
-            _processes = new ObservableCollection<MyProcess>(Updater.ActiveProcesses);
+            _processes = Updater.GetProcesses();
             OnPropertyChanged(nameof(Processes));
         }
     }
