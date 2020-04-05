@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Miedviediev_04.Models;
 using System.Timers;
 using Microsoft.Win32;
+using Miedviediev_04.Sorting;
 using Timer = System.Timers.Timer;
 
 namespace Miedviediev_04.Managers
@@ -66,7 +67,10 @@ namespace Miedviediev_04.Managers
             {
                 try
                 {
-                    list.Add(new MyProcess(process));
+                    if (process.Modules.Count != 0)
+                    {
+                        list.Add(new MyProcess(process));
+                    }
                 }
                 catch (Exception)
                 {
@@ -82,28 +86,29 @@ namespace Miedviediev_04.Managers
             {
                 if (state)
                 {
-                    ObservableCollection<MyProcess> copy = GetProcesses();
-                    ObservableCollection<MyProcess> processes = GetProcesses();
-                    foreach (var process in activeProcesses)
-                    {
-                        if (!processes.Contains(process))
-                            activeProcesses.Remove(process);
-                        
-                    }
-                    foreach (var process in processes)
-                    {
-                        if(!activeProcesses.Contains(process))
-                            activeProcesses.Add(process);
-                    }
-                    UpdateManager<MyProcess>.Instance.Owner.UpdateUi();
-                    return;
+                    // ObservableCollection<MyProcess> copy = GetProcesses();
+                    // ObservableCollection<MyProcess> processes = GetProcesses();
+                    // foreach (var process in activeProcesses)
+                    // {
+                    //     if (!processes.Contains(process))
+                    //         activeProcesses.Remove(process);
+                    //     
+                    // }
+                    // foreach (var process in processes)
+                    // {
+                    //     if(!activeProcesses.Contains(process))
+                    //         activeProcesses.Add(process);
+                    // }
+                    // UpdateManager<MyProcess>.Instance.Owner.UpdateUi();
+                    // return;
                 }
-
-                foreach (var t in activeProcesses)
+                
+                for(int i = 0; i < activeProcesses.Count; ++i)
                 {
-                    t.Update(Process.GetProcessById(t.Id));
+                    activeProcesses[i].Update(Process.GetProcessById(activeProcesses[i].Id));
+                    DataGridSortBehaviour.SortValue(activeProcesses[i], i);
+                    UpdateManager<MyProcess>.Instance.Owner.UpdateUi();
                 }
-                UpdateManager<MyProcess>.Instance.Owner.UpdateUi();
             }
         }
     }
