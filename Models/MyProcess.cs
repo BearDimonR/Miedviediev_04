@@ -1,10 +1,13 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Management;
+using System.Runtime.CompilerServices;
+using Miedviediev_04.Annotations;
 
 namespace Miedviediev_04.Models
 {
-    public class MyProcess:IEquatable<MyProcess>
+    public class MyProcess:IEquatable<MyProcess>, INotifyPropertyChanged 
     {
 
         private Process _process;
@@ -40,13 +43,22 @@ namespace Miedviediev_04.Models
             _ram =  new PerformanceCounter("Process",
                 "Working Set - Private", 
                 process.ProcessName, true);
-            _ram.NextValue();
-            // User = GetProcessOwner(process);
+            _ram.NextValue(); 
+            //User = GetProcessOwner(process);
+           
         }
 
         public void Update(Process process)
         {
             _process = process;
+            OnPropertyChanged(nameof(Cpu));
+            OnPropertyChanged(nameof(Ram));
+            OnPropertyChanged(nameof(Responding));
+            OnPropertyChanged(nameof(Threads));
+            OnPropertyChanged(nameof(Id));
+            OnPropertyChanged(nameof(StartFrom));
+            OnPropertyChanged(nameof(Name));
+            OnPropertyChanged(nameof(StartTime));
         }
         
         private static string GetProcessOwner(Process process)
@@ -90,6 +102,14 @@ namespace Miedviediev_04.Models
         public override int GetHashCode()
         {
             return Id;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

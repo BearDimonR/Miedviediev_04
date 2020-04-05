@@ -1,4 +1,6 @@
-﻿using Miedviediev_04.Navigation;
+﻿using System.Windows.Controls;
+using System.Windows.Data;
+using Miedviediev_04.Navigation;
 
 namespace Miedviediev_04.Views
 {

@@ -1,12 +1,14 @@
 ﻿
+using Miedviediev_04.Models;
+
 namespace Miedviediev_04.Managers
 {
-    internal class UpdateManager
+    internal class UpdateManager<T>
     {
         private static readonly object Locker = new object();
-        private static UpdateManager _instance;
+        private static UpdateManager<T> _instance;
 
-        internal static UpdateManager Instance
+        internal static UpdateManager<T> Instance
         {
             get
             {
@@ -14,19 +16,19 @@ namespace Miedviediev_04.Managers
                     return _instance;
                 lock (Locker)
                 {
-                    return _instance ?? (_instance = new UpdateManager());
+                    return _instance ?? (_instance = new UpdateManager<T>());
                 }
             }
         }
 
-        private IUpdaterOwner _owner;
-        public IUpdaterOwner Owner => _owner;
+        private IUpdaterOwner<T> _owner;
+        public IUpdaterOwner<T> Owner => _owner;
 
         private UpdateManager()
         {
         }
 
-        internal void Initialize(IUpdaterOwner owner)
+        internal void Initialize(IUpdaterOwner<T> owner)
         {
             _owner = owner;
         }

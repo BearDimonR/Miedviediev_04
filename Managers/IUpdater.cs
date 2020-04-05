@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using Miedviediev_04.Models;
 
 namespace Miedviediev_04.Managers
@@ -12,9 +13,7 @@ namespace Miedviediev_04.Managers
         void StartUpdate();
         
         void StopUpdate();
-
-        ObservableCollection<MyProcess> GetProcesses();
-
+        
         void RemoveProcess(MyProcess myProcess);
     }
 }

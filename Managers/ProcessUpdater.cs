@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Miedviediev_04.Models;
 using System.Timers;
+using Microsoft.Win32;
 using Timer = System.Timers.Timer;
 
 namespace Miedviediev_04.Managers
@@ -26,45 +29,18 @@ namespace Miedviediev_04.Managers
         private Timer _metaTimer;
         private Timer _listTimer;
         private static object _locker = new object();
-
-        private static List<MyProcess> _activeProcesses;
+        public static object Locker => _locker;
 
         internal ProcessUpdater(int metaTimer, int listTimer)
         {
-            _activeProcesses = new List<MyProcess>();
             _metaTimer = new Timer(metaTimer);
-            _metaTimer.Elapsed += MetaUpdate;
+            _metaTimer.Elapsed += (timersender, timerevent) => 
+                Update(timerevent, timerevent, UpdateManager<MyProcess>.Instance.Owner.CurrCollection, false);
             _metaTimer.AutoReset = true;
             _listTimer = new Timer(listTimer);
-            _listTimer.Elapsed += ListUpdate;
+            _listTimer.Elapsed += (timersender, timerevent) => 
+                Update(timerevent, timerevent, UpdateManager<MyProcess>.Instance.Owner.CurrCollection, true);
             _listTimer.AutoReset = true;
-            foreach (var process in Process.GetProcesses())
-            {
-                try
-                {
-                    _activeProcesses.Add(new MyProcess(process));
-                }
-                catch (Exception)
-                {
-                    // ignored
-                }
-            }
-        }
-
-        public ObservableCollection<MyProcess> GetProcesses()
-        {
-            lock (_locker)
-            {
-                return new ObservableCollection<MyProcess>(_activeProcesses);
-            }
-        }
-
-        public void RemoveProcess(MyProcess myProcess)
-        {
-            lock (_locker)
-            {
-                _activeProcesses.Remove(myProcess);
-            }
         }
 
         public void StartUpdate()
@@ -75,23 +51,16 @@ namespace Miedviediev_04.Managers
 
         public void StopUpdate()
         {
-            _metaTimer.Stop();
-            _listTimer.Stop();
         }
 
-        private void MetaUpdate(object o, ElapsedEventArgs args)
+        public void RemoveProcess(MyProcess myProcess)
         {
-            lock (_locker)
-            {
-                foreach (var myProcess in _activeProcesses)
-                    myProcess.Update(Process.GetProcessById(myProcess.Id));
-                UpdateManager.Instance.Owner.UpdateUi();
-            }
+            lock(_locker)
+                UpdateManager<MyProcess>.Instance.Owner.CurrCollection.Remove(myProcess);
         }
 
-        private void ListUpdate(object o, ElapsedEventArgs args)
+        public static ObservableCollection<MyProcess> GetProcesses()
         {
-
             List<MyProcess> list = new List<MyProcess>();
             foreach (var process in Process.GetProcesses())
             {
@@ -104,11 +73,37 @@ namespace Miedviediev_04.Managers
                     // ignored
                 }
             }
+            return new ObservableCollection<MyProcess>(list);
+        }
 
+        private void Update(object o, ElapsedEventArgs args, ObservableCollection<MyProcess> activeProcesses, bool state)
+        {
             lock (_locker)
             {
-                _activeProcesses = list;
-                UpdateManager.Instance.Owner.UpdateUi();
+                if (state)
+                {
+                    ObservableCollection<MyProcess> copy = GetProcesses();
+                    ObservableCollection<MyProcess> processes = GetProcesses();
+                    foreach (var process in activeProcesses)
+                    {
+                        if (!processes.Contains(process))
+                            activeProcesses.Remove(process);
+                        
+                    }
+                    foreach (var process in processes)
+                    {
+                        if(!activeProcesses.Contains(process))
+                            activeProcesses.Add(process);
+                    }
+                    UpdateManager<MyProcess>.Instance.Owner.UpdateUi();
+                    return;
+                }
+
+                foreach (var t in activeProcesses)
+                {
+                    t.Update(Process.GetProcessById(t.Id));
+                }
+                UpdateManager<MyProcess>.Instance.Owner.UpdateUi();
             }
         }
     }

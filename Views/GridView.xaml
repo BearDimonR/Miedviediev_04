@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Miedviediev_04.Views"
              xmlns:viewModels="clr-namespace:Miedviediev_04.ViewModels"
+             xmlns:sorting="clr-namespace:Miedviediev_04.Sorting"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.DataContext>
@@ -22,12 +23,12 @@
                       Margin="30, 10, 10, 30"
                       Width="1000"
                       Height="700"
-                      ItemsSource="{Binding Processes, Mode=OneWay}"
+                      ItemsSource="{Binding CurrCollection, Mode=TwoWay}"
                       IsReadOnly="True"
                       FontSize="16"
                       FontFamily="Times New Roman"
-                      AutoGenerateColumns="False"
-                      >
+                      sorting:DataGridSortBehaviour.AllowCustomSort="True"
+                      AutoGenerateColumns="False">
                 <DataGrid.Resources>
                     <Style TargetType="{x:Type DataGridCell}">
                         <Style.Triggers>
@@ -39,15 +40,15 @@
                     </Style>
                 </DataGrid.Resources>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name, Mode=OneTime}"/>
-                    <DataGridTextColumn Header="ID" Binding="{Binding Id, Mode=OneTime}"/>
-                    <DataGridTextColumn Header="Responding" Binding="{Binding Responding, Mode=OneWay}"/>
-                    <DataGridTextColumn Header="CPU %" Binding="{Binding Cpu, Mode=OneWay}" />
-                    <DataGridTextColumn Header="RAM %" Binding="{Binding Ram, Mode=OneWay}"/>
-                    <DataGridTextColumn Header="Streams" Binding="{Binding Threads, Mode=OneWay}"/>
-                    <DataGridTextColumn Header="User" Binding="{Binding User, Mode=OneTime}"/>
-                    <DataGridTextColumn Header="Time" Binding="{Binding StartTime, Mode=OneTime}"/>
-                    <DataGridTextColumn Header="Start From" Binding="{Binding StartFrom, Mode=OneTime}"/>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name, Mode=OneTime}" sorting:DataGridSortBehaviour.SortField="Name"/>
+                    <DataGridTextColumn Header="ID" Binding="{Binding Id, Mode=OneTime}" sorting:DataGridSortBehaviour.SortField="Id"/>
+                    <DataGridTextColumn Header="Responding" Binding="{Binding Responding, Mode=OneWay}" sorting:DataGridSortBehaviour.SortField="Responding"/>
+                    <DataGridTextColumn Header="CPU %" Binding="{Binding Cpu, Mode=OneWay}" sorting:DataGridSortBehaviour.SortField="Cpu" />
+                    <DataGridTextColumn Header="RAM %" Binding="{Binding Ram, Mode=OneWay}" sorting:DataGridSortBehaviour.SortField="Ram"/>
+                    <DataGridTextColumn Header="Streams" Binding="{Binding Threads, Mode=OneWay}" sorting:DataGridSortBehaviour.SortField="Streams"/>
+                    <DataGridTextColumn Header="User" Binding="{Binding User, Mode=OneTime}" sorting:DataGridSortBehaviour.SortField="User"/>
+                    <DataGridTextColumn Header="Time" Binding="{Binding StartTime, Mode=OneTime}" sorting:DataGridSortBehaviour.SortField="Time"/>
+                    <DataGridTextColumn Header="Start From" Binding="{Binding StartFrom, Mode=OneTime}" sorting:DataGridSortBehaviour.SortField="StartFrom"/>
                 </DataGrid.Columns>
             </DataGrid>
             <StackPanel>

@@ -1,19 +1,29 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using Miedviediev_04.Managers;
 using Miedviediev_04.Models;
 using Miedviediev_04.Navigation;
 
 namespace Miedviediev_04.ViewModels
 {
-    public class DataGridVm:BaseVm, INavigatableDataContext, IUpdaterOwner
+    public class DataGridVm:BaseVm, INavigatableDataContext, IUpdaterOwner<MyProcess>
     {
         private ObservableCollection<MyProcess> _processes;
-        public ObservableCollection<MyProcess> Processes => _processes;
-        
+        public ObservableCollection<MyProcess> CurrCollection
+        {
+            get => _processes;
+            set
+            {
+                _processes = value;
+                OnPropertyChanged(nameof(CurrCollection));
+            }
+        }
+
         public RelayCommand<MyProcess> InfoCommand { get; } 
         public RelayCommand<MyProcess> FolderCommand { get; }
         public RelayCommand<MyProcess> StopCommand { get; }
@@ -23,9 +33,9 @@ namespace Miedviediev_04.ViewModels
             InfoCommand = new RelayCommand<MyProcess>(NavigateInfo);
             FolderCommand = new RelayCommand<MyProcess>(OpenFolder);
             StopCommand = new RelayCommand<MyProcess>(StopProcess);
-            UpdateManager.Instance.Initialize(this);
-            Updater = new ProcessUpdater(2000, 5000);
-            _processes = Updater.GetProcesses();
+            UpdateManager<MyProcess>.Instance.Initialize(this);
+            Updater = new ProcessUpdater(1000, 5000);
+            _processes = ProcessUpdater.GetProcesses();
             Updater.StartUpdate();
         }
 
@@ -70,11 +80,10 @@ namespace Miedviediev_04.ViewModels
         public void Execute(object obj) {}
 
         public IUpdater Updater { get; set; }
-        
+
         public void UpdateUi()
         {
-            _processes = Updater.GetProcesses();
-            OnPropertyChanged(nameof(Processes));
+            OnPropertyChanged(nameof(CurrCollection));
         }
     }
 }
