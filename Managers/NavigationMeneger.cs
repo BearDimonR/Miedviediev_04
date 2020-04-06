@@ -1,4 +1,4 @@
-﻿﻿﻿using Miedviediev_04.Navigation;
+﻿﻿using Miedviediev_04.Navigation;
 
  namespace Miedviediev_04.Managers
 {

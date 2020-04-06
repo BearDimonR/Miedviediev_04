@@ -1,4 +1,4 @@
-﻿namespace Miedviediev_04
+﻿namespace Miedviediev_04.Views
 {
     /// <summary>
     /// Interaction logic for App.xaml

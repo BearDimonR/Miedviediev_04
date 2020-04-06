@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using Miedviediev_04.Models;
+﻿using System.ComponentModel;
 
 namespace Miedviediev_04.Managers
 {
@@ -8,7 +6,7 @@ namespace Miedviediev_04.Managers
     {
         IUpdater Updater { set; get; }
 
-         ObservableCollection<T>  CurrCollection { get; set; }
+        AsyncObservableCollection<T>  CurrCollection { get; set; }
 
         void UpdateUi(); }
 }

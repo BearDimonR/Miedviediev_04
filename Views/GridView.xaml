@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:Miedviediev_04.Views"
              xmlns:viewModels="clr-namespace:Miedviediev_04.ViewModels"
              xmlns:sorting="clr-namespace:Miedviediev_04.Sorting"
              mc:Ignorable="d"
@@ -44,7 +43,8 @@
                     <DataGridTextColumn Header="ID" Binding="{Binding Id, Mode=OneTime}" sorting:DataGridSortBehaviour.SortField="Id"/>
                     <DataGridTextColumn Header="Responding" Binding="{Binding Responding, Mode=OneWay}" sorting:DataGridSortBehaviour.SortField="Responding"/>
                     <DataGridTextColumn Header="CPU %" Binding="{Binding Cpu, Mode=OneWay}" sorting:DataGridSortBehaviour.SortField="Cpu" />
-                    <DataGridTextColumn Header="RAM %" Binding="{Binding Ram, Mode=OneWay}" sorting:DataGridSortBehaviour.SortField="Ram"/>
+                    <DataGridTextColumn Header="RAM" Binding="{Binding Ram, Mode=OneWay}" sorting:DataGridSortBehaviour.SortField="RamP"/>
+                    <DataGridTextColumn Header="RAM %" Binding="{Binding RamPers, Mode=OneWay}" sorting:DataGridSortBehaviour.SortField="Ram"/>
                     <DataGridTextColumn Header="Streams" Binding="{Binding Threads, Mode=OneWay}" sorting:DataGridSortBehaviour.SortField="Streams"/>
                     <DataGridTextColumn Header="User" Binding="{Binding User, Mode=OneTime}" sorting:DataGridSortBehaviour.SortField="User"/>
                     <DataGridTextColumn Header="Time" Binding="{Binding StartTime, Mode=OneTime}" sorting:DataGridSortBehaviour.SortField="Time"/>

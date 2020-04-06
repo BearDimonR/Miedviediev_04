@@ -1,6 +1,4 @@
 ﻿
-using Miedviediev_04.Models;
-
 namespace Miedviediev_04.Managers
 {
     internal class UpdateManager<T>

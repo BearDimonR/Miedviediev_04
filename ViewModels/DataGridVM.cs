@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
 using Miedviediev_04.Managers;
 using Miedviediev_04.Models;
 using Miedviediev_04.Navigation;
@@ -13,8 +10,8 @@ namespace Miedviediev_04.ViewModels
 {
     public class DataGridVm:BaseVm, INavigatableDataContext, IUpdaterOwner<MyProcess>
     {
-        private ObservableCollection<MyProcess> _processes;
-        public ObservableCollection<MyProcess> CurrCollection
+        private AsyncObservableCollection<MyProcess> _processes;
+        public AsyncObservableCollection<MyProcess> CurrCollection
         {
             get => _processes;
             set
@@ -34,7 +31,7 @@ namespace Miedviediev_04.ViewModels
             FolderCommand = new RelayCommand<MyProcess>(OpenFolder);
             StopCommand = new RelayCommand<MyProcess>(StopProcess);
             UpdateManager<MyProcess>.Instance.Initialize(this);
-            Updater = new ProcessUpdater(1000, 5000);
+            Updater = new ProcessUpdater(1000, 1);
             _processes = ProcessUpdater.GetProcesses();
             Updater.StartUpdate();
         }

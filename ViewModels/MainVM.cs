@@ -25,7 +25,6 @@ namespace Miedviediev_04.ViewModels
 
         public bool IsControlEnabled
         {
-            //used in SignUp
             get => _isControlEnabled;
             set
             {

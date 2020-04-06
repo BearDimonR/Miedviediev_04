@@ -3,37 +3,72 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Management;
 using System.Runtime.CompilerServices;
+using Microsoft.VisualBasic.Devices;
 using Miedviediev_04.Annotations;
 
 namespace Miedviediev_04.Models
 {
-    public class MyProcess:IEquatable<MyProcess>, INotifyPropertyChanged 
+    public sealed class MyProcess : IEquatable<MyProcess>, INotifyPropertyChanged
     {
 
         private Process _process;
         public Process OriginProcess => _process;
 
-        public string Name => _process.ProcessName;
-        
-        public int Id => _process.Id;
-        
-        public bool Responding => _process.Responding;
-        
-        public int Threads => _process.Threads.Count;
+        public string Name { get; }
 
-        public DateTime StartTime => _process.StartTime;
+        public int Id { get; }
+
+        private bool _responding;
+        public bool Responding => _responding;
+
+        private int _threads;
+        public int Threads => _threads;
+
+        public DateTime StartTime { get; }
 
         public string User { get; }
 
-        public string StartFrom => _process.MainModule?.FileName;
+        public string StartFrom { get; }
 
-        private PerformanceCounter _cpu;
-        public float Cpu => _cpu.NextValue() / Environment.ProcessorCount;
+        private readonly PerformanceCounter _cpu;
 
-        private PerformanceCounter _ram;
-        public int Ram => Convert.ToInt32(_ram.NextValue()) / (int)(1024);
+        public float Cpu
+        {
+            get
+            {
+                try
+                {
+                    return _cpu.NextValue() / Environment.ProcessorCount * 2;
+                }
+                catch (Exception)
+                {
+                    return 0;
+                }
+            }
+        }
 
-        public MyProcess(Process process)
+        private readonly PerformanceCounter _ram;
+
+        public int Ram
+        {
+            get
+            {
+                try
+                {
+                    return Convert.ToInt32(_ram.NextValue()) / 1024;
+                }
+                catch (Exception)
+                {
+                    return 0;
+                }
+            }
+        }
+
+        private static readonly ulong TotalRam = new ComputerInfo().TotalPhysicalMemory;
+
+        public float RamPers => (float)Ram * 1024 / TotalRam * 100;
+
+    public MyProcess(Process process)
         {
             Update(process);
             _cpu =  new PerformanceCounter("Process", 
@@ -44,21 +79,25 @@ namespace Miedviediev_04.Models
                 "Working Set - Private", 
                 process.ProcessName, true);
             _ram.NextValue(); 
-            //User = GetProcessOwner(process);
-           
+            
+            
+            Name = process.ProcessName;
+            Id = process.Id;
+            StartFrom = process.MainModule == null ? string.Empty : process.MainModule.FileName;
+            StartTime = process.StartTime;
+            User = GetProcessOwner(process);
         }
 
         public void Update(Process process)
         {
             _process = process;
+            _responding = process.Responding && !process.HasExited;
+            _threads = process.Threads.Count;
             OnPropertyChanged(nameof(Cpu));
             OnPropertyChanged(nameof(Ram));
+            OnPropertyChanged(nameof(RamPers));
             OnPropertyChanged(nameof(Responding));
             OnPropertyChanged(nameof(Threads));
-            OnPropertyChanged(nameof(Id));
-            OnPropertyChanged(nameof(StartFrom));
-            OnPropertyChanged(nameof(Name));
-            OnPropertyChanged(nameof(StartTime));
         }
         
         private static string GetProcessOwner(Process process)
@@ -107,7 +146,7 @@ namespace Miedviediev_04.Models
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

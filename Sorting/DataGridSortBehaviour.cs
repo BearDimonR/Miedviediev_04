@@ -62,7 +62,7 @@ namespace Miedviediev_04.Sorting
 
         private static void HandleSorting(object sender, DataGridSortingEventArgs e)
         {
-            lock (ProcessUpdater.Locker)
+            ProcessUpdater.Locker = false;
             {
                 LoaderManager.Instance.ShowLoader();
                 var dataGrid = sender as DataGrid;
@@ -74,6 +74,7 @@ namespace Miedviediev_04.Sorting
                 e.Column.SortDirection = CurrSortDirection == ListSortDirection.Descending || CurrSortDirection == null
                     ? ListSortDirection.Ascending
                     : ListSortDirection.Descending;
+                ProcessUpdater.Locker = true;
                 LoaderManager.Instance.HideLoader();
             }
         }
@@ -122,6 +123,16 @@ namespace Miedviediev_04.Sorting
                     else
                         result = from u in collection
                             orderby u.Ram descending
+                            select u;
+                    break;
+                case Sorting.SortField.RamP:
+                    if (CurrSortDirection == ListSortDirection.Ascending)
+                        result = from u in collection
+                            orderby u.RamPers
+                            select u;
+                    else
+                        result = from u in collection
+                            orderby u.RamPers descending
                             select u;
                     break;
                 case Sorting.SortField.Responding:
@@ -188,29 +199,29 @@ namespace Miedviediev_04.Sorting
 
         public static void SortValue(MyProcess activeProcess, int index)
         {
-            // if (index == 0 || CurrSortDirection == null || CurrSortField == null)
-            //     return;
-            // for (int i = index - 1; i >= 0; --i)
-            // {
-            //     int res = Compare(activeProcess, UpdateManager<MyProcess>.Instance.Owner.CurrCollection[index]);
-            //     switch (CurrSortDirection)
-            //     {
-            //         case ListSortDirection.Ascending:
-            //             if (res > 0)
-            //             {
-            //                 UpdateManager<MyProcess>.Instance.Owner.CurrCollection.Move(i + 1, i);
-            //             }
-            //             break;
-            //         case ListSortDirection.Descending:
-            //             if (res < 0)
-            //             {
-            //                 UpdateManager<MyProcess>.Instance.Owner.CurrCollection.Move(i + 1, i);
-            //             }
-            //             break;
-            //         default:
-            //             return;
-            //     }
-            // }
+            if (index == 0 || CurrSortDirection == null || CurrSortField == null)
+                return;
+            for (int i = index - 1; i >= 0; --i)
+            {
+                int res = Compare(activeProcess, UpdateManager<MyProcess>.Instance.Owner.CurrCollection[index]);
+                switch (CurrSortDirection)
+                {
+                    case ListSortDirection.Ascending:
+                        if (res > 0)
+                        {
+                            UpdateManager<MyProcess>.Instance.Owner.CurrCollection.Move(i + 1, i);
+                        }
+                        break;
+                    case ListSortDirection.Descending:
+                        if (res < 0)
+                        {
+                            UpdateManager<MyProcess>.Instance.Owner.CurrCollection.Move(i + 1, i);
+                        }
+                        break;
+                    default:
+                        return;
+                }
+            }
         }
 
         private static int Compare(MyProcess u, MyProcess v)
@@ -225,6 +236,8 @@ namespace Miedviediev_04.Sorting
                     return u.Id.CompareTo(v.Id);
                 case Sorting.SortField.Ram:
                     return u.Ram.CompareTo(v.Ram);
+                case Sorting.SortField.RamP:
+                    return u.RamPers.CompareTo(v.RamPers);
                 case Sorting.SortField.Responding:
                     return u.Responding.CompareTo(v.Responding);
                 case Sorting.SortField.Streams:

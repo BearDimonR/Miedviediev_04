@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-
+﻿
 namespace Miedviediev_04.Navigation
 {
     public interface INavigatableDataContext

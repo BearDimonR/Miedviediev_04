@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using Miedviediev_04.Models;
+﻿using Miedviediev_04.Models;
 
 namespace Miedviediev_04.Managers
 {
@@ -15,5 +13,7 @@ namespace Miedviediev_04.Managers
         void StopUpdate();
         
         void RemoveProcess(MyProcess myProcess);
+        void AddProcess(MyProcess myProcess);
+        void Update(MyProcess myProcess);
     }
 }

@@ -7,6 +7,7 @@
         Responding,
         Cpu,
         Ram,
+        RamP,
         Streams,
         User,
         Time,
