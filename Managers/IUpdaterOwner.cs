@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Miedviediev_04.Managers
 {
@@ -7,6 +8,7 @@ namespace Miedviediev_04.Managers
         IUpdater Updater { set; get; }
 
         AsyncObservableCollection<T>  CurrCollection { get; set; }
+        SortedSet<int> CurrIds { get; set; }
 
         void UpdateUi(); }
 }

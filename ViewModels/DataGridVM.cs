@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -21,6 +22,8 @@ namespace Miedviediev_04.ViewModels
             }
         }
 
+        public SortedSet<int> CurrIds { get; set; }
+
         public RelayCommand<MyProcess> InfoCommand { get; } 
         public RelayCommand<MyProcess> FolderCommand { get; }
         public RelayCommand<MyProcess> StopCommand { get; }
@@ -33,6 +36,7 @@ namespace Miedviediev_04.ViewModels
             UpdateManager<MyProcess>.Instance.Initialize(this);
             Updater = new ProcessUpdater(1000, 1);
             _processes = ProcessUpdater.GetProcesses();
+            CurrIds = ProcessUpdater.GetCurrIds();
             Updater.StartUpdate();
         }
 
